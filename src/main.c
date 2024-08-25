@@ -181,14 +181,19 @@ char *lsh_read_line(void)
     // Read a character
     c = getchar();
 
-    if (c == EOF) {
+    if (c == EOF && feof(stdin)) {
+      free(buffer);
       exit(EXIT_SUCCESS);
+    } else if (c == EOF && ferror(stdin)) {
+      perror("getchar (EOF)");
+      free(buffer);
+      exit(EXIT_FAILURE);
     } else if (c == '\n') {
       buffer[position] = '\0';
       return buffer;
-    } else {
-      buffer[position] = c;
     }
+
+    buffer[position] = c;
     position++;
 
     // If we have exceeded the buffer, reallocate.
